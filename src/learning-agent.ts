@@ -1,8 +1,8 @@
-export abstract class LearningAgent<Input, Output> {
+export abstract class LearningAgent<Action, Environment> {
 
-    history: Array<Input> = [];
+    history: Array<{input: Environment, action: Action, output: Environment}> = [];
 
-    act(state: Input): Output {
+    act(state: Action): Environment {
         const rating = this.rateAction(this.history, state);
         this.learn(this.history, rating);
         const curiosity = this.calculateCuriosity();
@@ -10,13 +10,13 @@ export abstract class LearningAgent<Input, Output> {
     }
 
     /** Performance element of the agent */
-    abstract selectAction(state: Input, curiosity: number): Output;
+    abstract selectAction(state: Action, curiosity: number): Environment;
 
     /** Critic of the agent - rates the previous action
      * based on the outcome/current state of the action history */
-    abstract rateAction(history: Array<Input>, currentState: Input): number;
+    abstract rateAction(history: Array<{input: Environment, action: Action, output: Environment}>, currentState: Action): number;
 
-    abstract learn(history: Array<Input>, rating: number);
+    abstract learn(history: Array<{input?: Environment, action: Action, output: Environment}>, rating: number);
 
     /** Problem generator of the agent, should use data of the learning element to calculate */
     abstract calculateCuriosity(): number;
