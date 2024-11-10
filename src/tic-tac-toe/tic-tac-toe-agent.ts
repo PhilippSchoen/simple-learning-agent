@@ -8,11 +8,17 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeState, TicTacToeMove>
     experience: Map<TicTacToeState, {action: TicTacToeMove, rating: number, confidence: number}[]> = new Map<TicTacToeState, {action: TicTacToeMove, rating: number, confidence: number}[]>();
 
     calculateCuriosity(state: TicTacToeState): number {
+        let curiosity = 0;
         const actions = this.getAvailableActions(state);
-        // If missing move in experience, return 2
-        // If moves in experience have less than 5 experience each, return 1
-        // Else, return 0
-        return 0;
+        for(let action of actions) {
+            if(!this.experience.get(state).find((exp) => exp.action === action)) {
+                return 2;
+            }
+            else if(this.experience.get(state).find((exp) => exp.action === action).confidence < 2) {
+                curiosity = 1;
+            }
+        }
+        return curiosity;
     }
 
     rateAction(history: Array<{input: TicTacToeState, action: TicTacToeMove, output: TicTacToeState}>, currentState: TicTacToeState): number {
