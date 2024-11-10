@@ -3,25 +3,33 @@ import {TicTacToeState} from "./tic-tac-toe-state";
 import {TicTacToeMove} from "./tic-tac-toe-move";
 import {TicTacToePlayer} from "./tic-tac-toe-player";
 
-export class TicTacToeAgent extends LearningAgent<TicTacToeState, TicTacToeMove> {
+export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState> {
 
     experience: Map<TicTacToeState, {action: TicTacToeMove, rating: number, confidence: number}[]> = new Map<TicTacToeState, {action: TicTacToeMove, rating: number, confidence: number}[]>();
 
+    private requiredConfidence = 2;
+
     calculateCuriosity(state: TicTacToeState): number {
-        let curiosity = 0;
+        if(this.experience.get(state) === undefined)
+            return 2;
+
         const actions = this.getAvailableActions(state);
         for(let action of actions) {
             if(!this.experience.get(state).find((exp) => exp.action === action)) {
                 return 2;
             }
-            else if(this.experience.get(state).find((exp) => exp.action === action).confidence < 2) {
-                curiosity = 1;
-            }
         }
-        return curiosity;
+        if(this.experience.get(state).find((exp) => exp.confidence < this.requiredConfidence)) {
+            return 1;
+        }
+        return 0;
     }
 
     rateAction(history: Array<{input: TicTacToeState, action: TicTacToeMove, output: TicTacToeState}>, currentState: TicTacToeState): number {
+
+        if(history.length < 1)
+            return 0;
+
         const previousPlayerChain = this.calculateChainLength(history[history.length - 1].input, TicTacToePlayer.X);
         const playerChain = this.calculateChainLength(currentState, TicTacToePlayer.X);
         const previousEnemyChain = this.calculateChainLength(history[history.length - 1].input, TicTacToePlayer.O);
@@ -45,9 +53,9 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeState, TicTacToeMove>
     }
 
     learn(history: Array<{input: TicTacToeState, action: TicTacToeMove, output: TicTacToeState}>, rating: number) {
-        if(history.length === 0) {
+        if(history.length < 1)
             return;
-        }
+
         const previous = history[history.length - 1];
         let previousExperience = this.experience.get(previous.input);
         const action = previousExperience.find((exp) => exp.action === previous.action);
@@ -111,14 +119,28 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeState, TicTacToeMove>
     }
 
     selectAction(state: TicTacToeState, curiosity: number): TicTacToeMove {
+
+        const actions = this.getAvailableActions(state);
+
+        if(this.experience.get(state) === undefined) {
+            return actions[0];
+        }
+
         if(curiosity > 1) {
-            // Return random unknown move
+            for(let action of actions) {
+                if(!this.experience.get(state).find((exp) => exp.action === action)) {
+                    return action;
+                }
+            }
         }
         else if(curiosity > 0) {
-            // Return move with least experience
+            const leastExperience = this.experience.get(state).find((exp) => exp.confidence < this.requiredConfidence);
+            return leastExperience.action;
         }
         else {
-            // Return move with highest experience
+            const highestRating = Math.max(...this.experience.get(state).map(exp => exp.rating));
+            const experience = this.experience.get(state).find(item => item.rating === highestRating);
+            return experience.action;
         }
         return undefined;
     }
@@ -131,7 +153,7 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeState, TicTacToeMove>
         const actions: TicTacToeMove[] = [];
         for (let i = 0; i < state.board.length; i++) {
             for (let j = 0; j < state.board[i].length; j++) {
-                const move = {x: i, y: j};
+                const move = new TicTacToeMove(i, j);
                 if(this.isValidMove(state, move)) {
                     actions.push(move);
                 }
