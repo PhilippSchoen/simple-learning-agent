@@ -1,7 +1,9 @@
 import {TicTacToeAgent} from "./tic-tac-toe/tic-tac-toe-agent";
 import {TicTacToeState} from "./tic-tac-toe/tic-tac-toe-state";
+import {TicTacToeService} from "./tic-tac-toe/tic-tac-toe.service";
 
-const agent = new TicTacToeAgent();
+const service = new TicTacToeService();
+const agent = new TicTacToeAgent(service);
 let state = new TicTacToeState();
 for(let i = 0; i < 1000; i++) {
     state = agent.act(state);
