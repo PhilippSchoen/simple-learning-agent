@@ -25,7 +25,21 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
         return 0;
     }
 
+    private isEmpty(state: TicTacToeState): boolean {
+        for(let i = 0; i < state.board.length; i++) {
+            for(let j = 0; j < state.board[i].length; j++) {
+                if(state.board[i][j] !== TicTacToePlayer.Empty) {
+                    return false;
+                }
+            }
+        }
+        return true
+    }
+
     rateAction(history: Array<{input: TicTacToeState, action: TicTacToeMove, output: TicTacToeState}>, currentState: TicTacToeState): number {
+        if(this.isEmpty(currentState)) {
+            return 0;
+        }
 
         if(history.length < 1)
             return 0;
@@ -58,14 +72,21 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
 
         const previous = history[history.length - 1];
         let previousExperience = this.experience.get(previous.input);
-        const action = previousExperience.find((exp) => exp.action === previous.action);
+        if(!previousExperience) {
+            previousExperience = [];
+        }
+        console.log("Previous: ", previousExperience);
+
+        const action = previousExperience?.find((exp) => exp.action === previous.action);
         // If action not included in experience, add it
-        if(action) {
+        if(!action) {
+            console.log("Not included");
             previousExperience.push({action: previous.action, rating: rating, confidence: 1});
             this.experience.set(previous.input, previousExperience);
         }
         // If action is included in experience, update rating and confidence
         else {
+            console.log("Included");
             action.rating = (action.rating * action.confidence + rating) / (action.confidence + 1);
             action.confidence++;
         }
