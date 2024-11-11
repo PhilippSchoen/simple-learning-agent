@@ -14,6 +14,9 @@ export class TicTacToeMove extends Action<TicTacToeState>{
         console.log("Board: ");
         console.log(input.board.map((row) => row.map((cell) => cell === TicTacToePlayer.Empty ? " " : cell).join(" ")).join("\n"));
 
+        console.log("Player chain length from action: ", this.calculateChainLength(input, TicTacToePlayer.X));
+        console.log("Enemy chain length from action: ", this.calculateChainLength(input, TicTacToePlayer.O));
+
         if(this.hasWon(input)) {
             return new TicTacToeState();
         }
