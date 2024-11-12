@@ -6,11 +6,9 @@ export abstract class LearningAgent<A extends Action<Environment>, Environment> 
 
     act(state: Environment): Environment {
         const rating = this.rateAction(this.history, state);
-        console.log("Rating: ", rating);
         this.learn(this.history, rating);
         const curiosity = this.calculateCuriosity(state);
         const action = this.selectAction(state, curiosity);
-        console.log("State, curiosity: ", state, curiosity);
         const output = action.execute(state);
         this.history.push({input: state, action: action, output: output});
         return output;

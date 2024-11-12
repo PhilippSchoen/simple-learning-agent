@@ -13,14 +13,16 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
     experience: Map<string, {action: TicTacToeMove, rating: number, confidence: number}[]> = new Map<string, {action: TicTacToeMove, rating: number, confidence: number}[]>();
 
     private requiredConfidence = 2;
+    private matchDuration = 0;
 
     calculateCuriosity(state: TicTacToeState): number {
-        if(this.experience.get(state.stateId) === undefined)
+        if(this.experience.get(state.stateId) === undefined) {
             return 2;
+        }
 
         const actions = this.getAvailableActions(state);
         for(let action of actions) {
-            if(!this.experience.get(state.stateId).find((exp) => exp.action === action)) {
+            if(!this.experience.get(state.stateId).find((exp) => (exp.action.x === action.x && exp.action.y === action.y))) {
                 return 2;
             }
         }
@@ -43,36 +45,32 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
 
     rateAction(history: Array<{input: TicTacToeState, action: TicTacToeMove, output: TicTacToeState}>, currentState: TicTacToeState): number {
         if(this.isEmpty(currentState)) {
-            return 666;
+            return 404;
         }
 
-        if(history.length < 1)
-            return 666;
+        if(this.matchDuration < 1)
+            return 404;
 
         const previousPlayerChain = this.ticTacToeService.calculateChainLength(history[history.length - 1].input, TicTacToePlayer.X);
         const playerChain = this.ticTacToeService.calculateChainLength(currentState, TicTacToePlayer.X);
         const previousEnemyChain = this.ticTacToeService.calculateChainLength(history[history.length - 1].input, TicTacToePlayer.O);
         const enemyChain = this.ticTacToeService.calculateChainLength(currentState, TicTacToePlayer.O);
-        console.log("Player chain: ", playerChain);
-        console.log("Previous player chain: ", previousPlayerChain);
 
         if(playerChain >= 3) {
-            console.log("Rating: Player has won!");
             return 5;
         }
         else if(enemyChain >= 3) {
-            console.log("Rating: Enemy has won!");
             return -5;
         }
 
         let score = 0;
-        if(playerChain > previousPlayerChain) {
-            score += 2;
-        }
-        if(enemyChain > previousEnemyChain) {
-            score -= 1;
-        }
-        console.log("Rating: ", score);
+        // if(playerChain > previousPlayerChain) {
+        //     score += 2;
+        // }
+        // if(enemyChain > previousEnemyChain) {
+        //     score -= 1;
+        // }
+
         return score;
     }
 
@@ -80,7 +78,7 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
         if(history.length < 1)
             return;
 
-        if(rating === 666)
+        if(rating === 404)
             return;
 
         const previous = history[history.length - 1];
@@ -89,22 +87,40 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
             previousExperience = [];
         }
 
+        if(previous.action.isWinningMove) {
+            for(let i = 0; i < this.matchDuration; i++) {
+                const previousExperience = this.experience.get(history[history.length - 1 - i].input.stateId);
+                const exp = previousExperience?.find((exp) => (exp.action.x === history[history.length - 1 - i].action.x && exp.action.y === history[history.length - 1 - i].action.y));
+                if(exp) {
+                    this.updateRating(exp, exp.rating + (5 - this.matchDuration));
+                }
+            }
+            this.matchDuration = 0;
+        }
+
+        if(this.matchDuration < 2) {
+            rating = 0;
+        }
+
         const action = previousExperience?.find((exp) => (exp.action.x === previous.action.x && exp.action.y === previous.action.y));
         // If action not included in experience, add it
         if(!action) {
-            console.log("Not included");
             previousExperience.push({action: previous.action, rating: rating, confidence: 1});
             this.experience.set(previous.input.stateId, previousExperience);
         }
         // If action is included in experience, update rating and confidence
         else {
-            console.log("Included: ", action);
-            action.rating = (action.rating * action.confidence + rating) / (action.confidence + 1);
-            action.confidence++;
+            this.updateRating(action, rating);
         }
     }
 
+    private updateRating(exp: {action: TicTacToeMove, rating: number, confidence: number}, rating: number) {
+        exp.rating = (exp.rating * exp.confidence + rating) / (exp.confidence + 1);
+        exp.confidence++;
+    }
+
     selectAction(state: TicTacToeState, curiosity: number): TicTacToeMove {
+        this.matchDuration++;
 
         const actions = this.getAvailableActions(state);
 
@@ -114,7 +130,7 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
 
         if(curiosity > 1) {
             for(let action of actions) {
-                if(!this.experience.get(state.stateId).find((exp) => exp.action === action)) {
+                if(!(this.experience.get(state.stateId).find((exp) => (exp.action.x === action.x && exp.action.y === action.y)))) {
                     return action;
                 }
             }
@@ -128,6 +144,7 @@ export class TicTacToeAgent extends LearningAgent<TicTacToeMove, TicTacToeState>
             const experience = this.experience.get(state.stateId).find(item => item.rating === highestRating);
             return experience.action;
         }
+        console.error("No action found!");
         return undefined;
     }
 

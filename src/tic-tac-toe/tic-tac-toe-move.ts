@@ -5,12 +5,13 @@ import {TicTacToeService} from "./tic-tac-toe.service";
 
 export class TicTacToeMove extends Action<TicTacToeState>{
 
+    isWinningMove = false;
+
     constructor(public x: number, public y: number, private ticTacToeService: TicTacToeService) {
         super();
     }
 
     execute(input: TicTacToeState): TicTacToeState {
-        console.log("Moving " + this.x + " " + this.y);
         const output = new TicTacToeState();
         output.board = input.board.map((row) => row.map((cell) => cell));
         output.board[this.x][this.y] = TicTacToePlayer.X;
@@ -18,7 +19,7 @@ export class TicTacToeMove extends Action<TicTacToeState>{
         console.log(output.board.map((row) => row.map((cell) => cell === TicTacToePlayer.Empty ? " " : cell).join(" ")).join("\n"));
 
         if(this.hasWon(output)) {
-            console.log("Returned new game");
+            this.isWinningMove = true;
             return new TicTacToeState();
         }
 
