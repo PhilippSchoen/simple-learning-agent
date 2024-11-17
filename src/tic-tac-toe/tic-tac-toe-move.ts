@@ -7,14 +7,14 @@ export class TicTacToeMove extends Action<TicTacToeState>{
 
     isWinningMove = false;
 
-    constructor(public x: number, public y: number, private ticTacToeService: TicTacToeService) {
+    constructor(public x: number, public y: number, private ticTacToeService: TicTacToeService, private player = TicTacToePlayer.X) {
         super();
     }
 
     execute(input: TicTacToeState): TicTacToeState {
         const output = new TicTacToeState();
         output.board = input.board.map((row) => row.map((cell) => cell));
-        output.board[this.x][this.y] = TicTacToePlayer.X;
+        output.board[this.x][this.y] = this.player;
         console.log("Board: ");
         console.log(output.board.map((row) => row.map((cell) => cell === TicTacToePlayer.Empty ? " " : cell).join(" ")).join("\n"));
 
