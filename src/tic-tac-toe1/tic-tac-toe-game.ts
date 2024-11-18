@@ -1,6 +1,5 @@
 import {TicTacToePlayer} from "./tic-tac-toe-player";
 import {TicTacToeState} from "./tic-tac-toe-state";
-import {TicTacToeService} from "../tic-tac-toe/tic-tac-toe.service";
 import {Empty, TicTacToeSymbol} from "./tic-tac-toe-symbol";
 
 export class TicTacToeGame {
@@ -64,20 +63,59 @@ export class TicTacToeGame {
                 if(localChainY > longestChain) {
                     longestChain = localChainY;
                 }
-
-                diagonalRL = this.calculateDiagonalLRChainLength(state, symbol, i, j, diagonalRL);
-                if(diagonalRL > longestChain) {
-                    longestChain = diagonalRL;
-                }
-
-                diagonalLR = this.calculateDiagonalRLChainLength(state, symbol, i, j, diagonalLR);
-                if(diagonalLR > longestChain) {
-                    longestChain = diagonalLR;
-                }
             }
         }
 
+        for (let i = 0; i < state.board.length; i++) {
+            longestChain = Math.max(longestChain, this.calculateDiagonalLRFrom(state, symbol, i, 0));
+            longestChain = Math.max(longestChain, this.calculateDiagonalRLFrom(state, symbol, i, state.board.length - 1));
+        }
+        for (let j = 1; j < state.board[0].length; j++) {
+            longestChain = Math.max(longestChain, this.calculateDiagonalLRFrom(state, symbol, 0, j));
+            longestChain = Math.max(longestChain, this.calculateDiagonalRLFrom(state, symbol, 0, j));
+        }
+
         return longestChain;
+    }
+
+    private calculateDiagonalLRFrom(state: TicTacToeState, symbol: TicTacToeSymbol, startRow: number, startCol: number): number {
+        let i = startRow;
+        let j = startCol;
+        let localChain = 0;
+        let maxChain = 0;
+
+        while (i < state.board.length && j < state.board[i].length) {
+            if (state.board[i][j] === symbol) {
+                localChain++;
+                maxChain = Math.max(maxChain, localChain);
+            } else {
+                localChain = 0;
+            }
+            i++;
+            j++;
+        }
+
+        return maxChain;
+    }
+
+    private calculateDiagonalRLFrom(state: TicTacToeState, symbol: TicTacToeSymbol, startRow: number, startCol: number): number {
+        let i = startRow;
+        let j = startCol;
+        let localChain = 0;
+        let maxChain = 0;
+
+        while (i < state.board.length && j >= 0) {
+            if (state.board[i][j] === symbol) {
+                localChain++;
+                maxChain = Math.max(maxChain, localChain);
+            } else {
+                localChain = 0;
+            }
+            i++;
+            j--;
+        }
+
+        return maxChain;
     }
 
     private calculateHorizontalChainLength(state: TicTacToeState, symbol: TicTacToeSymbol, i: number, j: number, localChain: number) {
@@ -94,29 +132,6 @@ export class TicTacToeGame {
             localChain++;
         } else {
             localChain = 0;
-        }
-        return localChain;
-    }
-
-    private calculateDiagonalLRChainLength(state: TicTacToeState, symbol: TicTacToeSymbol, i: number, j: number, localChain: number) {
-        if(i == j) {
-            if(state.board[i][j] === symbol) {
-                localChain++;
-            } else {
-                localChain = 0;
-            }
-        }
-        return localChain;
-    }
-
-    private calculateDiagonalRLChainLength(state: TicTacToeState, symbol: TicTacToeSymbol, i: number, j: number, localChain: number) {
-        const mirroredI = state.board.length - 1 - i;
-        if(mirroredI === j) {
-            if(state.board[mirroredI][j] === symbol) {
-                localChain++;
-            } else {
-                localChain = 0;
-            }
         }
         return localChain;
     }

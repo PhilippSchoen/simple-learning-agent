@@ -153,12 +153,38 @@ describe('Calculate TicTacToe chain length', () => {
         const game = new TicTacToeGame(player, player);
         const state = new TicTacToeState();
         state.board = [
-            [Empty, X, O],
+            [O, X, O],
             [O, O, X],
             [X, O, O]
         ];
         const length = game.calculateChainLength(state, O);
         expect(length).toBe(3);
+    });
+
+    test('calculate diagonal LR chain with length 2', () => {
+        const player = undefined as TicTacToePlayer;
+        const game = new TicTacToeGame(player, player);
+        const state = new TicTacToeState();
+        state.board = [
+            [X, X, O],
+            [O, Empty, X],
+            [X, O, X]
+        ];
+        const length = game.calculateChainLength(state, O);
+        expect(length).toBe(2);
+    });
+
+    test('calculate diagonal RL chain with length 2', () => {
+        const player = undefined as TicTacToePlayer;
+        const game = new TicTacToeGame(player, player);
+        const state = new TicTacToeState();
+        state.board = [
+            [O, X, O],
+            [X, Empty, O],
+            [Empty, O, X]
+        ];
+        const length = game.calculateChainLength(state, X);
+        expect(length).toBe(2);
     });
 
     test('Mixed board X', () => {
