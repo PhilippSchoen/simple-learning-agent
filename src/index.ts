@@ -1,15 +1,13 @@
-import {TicTacToeAgent} from "./tic-tac-toe/tic-tac-toe-agent";
-import {TicTacToeState} from "./tic-tac-toe/tic-tac-toe-state";
-import {TicTacToeService} from "./tic-tac-toe/tic-tac-toe.service";
-import {TicTacToeEnemy} from "./tic-tac-toe/tic-tac-toe-enemy";
-import {TicTacToeGame} from "./tic-tac-toe/tic-tac-toe-game";
 
-const service = new TicTacToeService();
-const agent = new TicTacToeAgent(service);
-const enemy = new TicTacToeEnemy(service);
-let state = new TicTacToeState();
+import {SimpleTicTacToeEnemy} from "./tic-tac-toe1/simple-tic-tac-toe-enemy";
+import {TicTacToeSymbol} from "./tic-tac-toe1/tic-tac-toe-symbol";
+import {TicTacToeGame} from "./tic-tac-toe1/tic-tac-toe-game";
+
+
 for(let i = 0; i < 5; i++) {
-    const game = new TicTacToeGame(agent, enemy);
+    const player1 = new SimpleTicTacToeEnemy(TicTacToeSymbol.X);
+    const player2 = new SimpleTicTacToeEnemy(TicTacToeSymbol.O);
+    const game = new TicTacToeGame(player2, player1);
     game.play();
 }
 

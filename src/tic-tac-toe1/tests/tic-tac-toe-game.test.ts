@@ -1,11 +1,67 @@
+import {TicTacToeGame} from "../tic-tac-toe-game";
+import {O, X, Empty} from "../tic-tac-toe-symbol";
+import {MockPlayer} from "./mock-tic-tac-toe-player";
+import {TicTacToePlayer} from "../tic-tac-toe-player";
+import {TicTacToeService} from "../../tic-tac-toe/tic-tac-toe.service";
+import {TicTacToeState} from "../tic-tac-toe-state";
+import {mocked} from "jest-mock"
+
+describe('TicTacToeGame', () => {
+    test('play function should run a full game', () => {
+
+        const mockPlayer1 = new MockPlayer(X, 1);
+        const mockPlayer2 = new MockPlayer(O, 2);
+
+        const startGameSpyP1 = jest.spyOn(mockPlayer1, 'startGame');
+        const startGameSpyP2 = jest.spyOn(mockPlayer2, 'startGame');
+        const playTurnSpyP1 = jest.spyOn(mockPlayer1, 'playTurn');
+        const playTurnSpyP2 = jest.spyOn(mockPlayer2, 'playTurn');
+        const endGameSpyP1 = jest.spyOn(mockPlayer1, 'endGame');
+        const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
+
+        const game = new TicTacToeGame(mockPlayer1, mockPlayer2);
+        game.play();
+
+        expect(startGameSpyP1).toHaveBeenCalledTimes(1);
+        expect(startGameSpyP2).toHaveBeenCalledTimes(1);
+        expect(playTurnSpyP1).toHaveBeenCalledTimes(3);
+        expect(playTurnSpyP2).toHaveBeenCalledTimes(2);
+        expect(endGameSpyP1).toHaveBeenCalledWith(X);
+        expect(endGameSpyP2).toHaveBeenCalledWith(X);
+    });
+
+    test('play function should work for a second game', () => {
+        const mockPlayer1 = new MockPlayer(O, 1);
+        const mockPlayer2 = new MockPlayer(X, 2);
+
+        const game = new TicTacToeGame(mockPlayer1, mockPlayer2);
+        game.play();
+
+        const startGameSpyP1 = jest.spyOn(mockPlayer1, 'startGame');
+        const startGameSpyP2 = jest.spyOn(mockPlayer2, 'startGame');
+        const playTurnSpyP1 = jest.spyOn(mockPlayer1, 'playTurn');
+        const playTurnSpyP2 = jest.spyOn(mockPlayer2, 'playTurn');
+        const endGameSpyP1 = jest.spyOn(mockPlayer1, 'endGame');
+        const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
+
+        game.play();
+
+        expect(startGameSpyP1).toHaveBeenCalledTimes(1);
+        expect(startGameSpyP2).toHaveBeenCalledTimes(1);
+        expect(playTurnSpyP1).toHaveBeenCalledTimes(3);
+        expect(playTurnSpyP2).toHaveBeenCalledTimes(2);
+        expect(endGameSpyP1).toHaveBeenCalledWith(O);
+        expect(endGameSpyP2).toHaveBeenCalledWith(O);
+    });
+});
+
 describe('Calculate TicTacToe chain length', () => {
-    import {TicTacToeService} from "./tic-tac-toe.service";
-    import {TicTacToeState} from "./tic-tac-toe-state";
-    import {X, O, Empty} from "./tic-tac-toe-player";
 
     test('calculate horizontal chain length X', () => {
-        const service = new TicTacToeService();
-        const state = new TicTacToeState();
+        jest.mock('../tic-tac-toe-player');
+        const MockPlayer = mocked(TicTacToePlayer);
+        const game = new TicTacToeGame(MockPlayer, MockPlayer);
+        const state = new TicTacToeState()
         state.board = [
             [X, X, X],
             [O, O, O],
@@ -172,5 +228,4 @@ describe('Calculate TicTacToe chain length', () => {
         expect(length).toBe(1);
     });
 });
-
 
