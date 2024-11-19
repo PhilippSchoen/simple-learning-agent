@@ -18,7 +18,7 @@ describe('TicTacToeGame', () => {
         const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
 
         const game = new TicTacToeGame(mockPlayer1, mockPlayer2);
-        expect(game.totalMatchTurns).toBe(0);
+        expect(game.gameLog.length).toBe(0);
         expect(game.playerTurns.X).toBe(0);
         expect(game.playerTurns.O).toBe(0);
 
@@ -31,7 +31,9 @@ describe('TicTacToeGame', () => {
         expect(endGameSpyP1).toHaveBeenCalledWith(game, X);
         expect(endGameSpyP2).toHaveBeenCalledWith(game, X);
 
-        expect(game.totalMatchTurns).toBe(5);
+        expect(game.gameLog.length).toBe(5);
+        expect(game.gameLog[0].stateId).toBe('---------');
+        expect(game.gameLog[1].stateId).toBe('---X-----');
         expect(game.playerTurns.X).toBe(3);
         expect(game.playerTurns.O).toBe(2);
     });
@@ -50,7 +52,7 @@ describe('TicTacToeGame', () => {
         const endGameSpyP1 = jest.spyOn(mockPlayer1, 'endGame');
         const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
 
-        expect(game.totalMatchTurns).toBe(5);
+        expect(game.gameLog.length).toBe(5);
         expect(game.playerTurns.X).toBe(2);
         expect(game.playerTurns.O).toBe(3);
 
@@ -63,7 +65,7 @@ describe('TicTacToeGame', () => {
         expect(endGameSpyP1).toHaveBeenCalledWith(game, O);
         expect(endGameSpyP2).toHaveBeenCalledWith(game, O);
 
-        expect(game.totalMatchTurns).toBe(5);
+        expect(game.gameLog.length).toBe(5);
         expect(game.playerTurns.X).toBe(2);
         expect(game.playerTurns.O).toBe(3);
     });

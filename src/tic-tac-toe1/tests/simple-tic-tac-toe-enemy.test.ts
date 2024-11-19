@@ -41,7 +41,8 @@ describe('SimpleTicTacToeEnemy', () => {
 
         state = new TicTacToeState();
         move = enemy.playTurn(state);
-        expect(state.board[1][0]).toEqual(X);
+        expect(move.x).toEqual(1);
+        expect(move.y).toEqual(0);
     });
 });
 

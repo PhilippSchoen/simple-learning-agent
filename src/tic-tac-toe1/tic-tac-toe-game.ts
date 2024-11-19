@@ -24,10 +24,11 @@ export class TicTacToeGame {
 
         while(!isGameOver) {
             this.playerTurns[this.player1.symbol]++;
-            this.totalMatchTurns++;
 
-            const move = this.player1.playTurn(state);
+            let move = this.player1.playTurn(state);
             this.gameLog.push({stateId: state.stateId, move});
+            state = this.executeMove(state, move);
+
             this.printBoard(state);
             if(this.hasWon(state, this.player1.symbol)) {
                 isGameOver = true;
@@ -38,9 +39,11 @@ export class TicTacToeGame {
             }
 
             this.playerTurns[this.player2.symbol]++;
-            this.totalMatchTurns++;
 
-            state = this.player2.playTurn(state);
+            move = this.player2.playTurn(state);
+            this.gameLog.push({stateId: state.stateId, move});
+            state = this.executeMove(state, move);
+
             this.printBoard(state);
             if(this.hasWon(state, this.player2.symbol)) {
                 isGameOver = true;
@@ -49,6 +52,22 @@ export class TicTacToeGame {
                 this.player2.endGame(this, this.player2.symbol);
             }
         }
+    }
+
+    private executeMove(state: TicTacToeState, move: TicTacToeMove): TicTacToeState {
+        const changedState = new TicTacToeState();
+        changedState.board = {...state}.board;
+        if(this.isValidMove(state, move)) {
+            changedState.board[move.x][move.y] = move.symbol;
+        }
+        return changedState;
+    }
+
+    private isValidMove(state: TicTacToeState, move: TicTacToeMove): boolean {
+        if(move.x < 0 || move.x >= state.board.length || move.y < 0 || move.y >= state.board[0].length) {
+            return false;
+        }
+        return state.board[move.x][move.y] === Empty;
     }
 
     private hasWon(state: TicTacToeState, player: TicTacToeSymbol): boolean {
@@ -62,7 +81,7 @@ export class TicTacToeGame {
     }
 
     private resetGame() {
-        this.totalMatchTurns = 0;
+        this.gameLog = [];
         this.playerTurns = {
             [TicTacToeSymbol.X]: 0,
             [TicTacToeSymbol.O]: 0,
