@@ -1,34 +1,52 @@
 import {TicTacToePlayer} from "./tic-tac-toe-player";
 import {TicTacToeState} from "./tic-tac-toe-state";
 import {Empty, TicTacToeSymbol} from "./tic-tac-toe-symbol";
+import {TicTacToeMove} from "./entities/tic-tac-toe-move";
 
 export class TicTacToeGame {
+
+    playerTurns: Record<TicTacToeSymbol, number> = {
+        [TicTacToeSymbol.X]: 0,
+        [TicTacToeSymbol.O]: 0,
+        [TicTacToeSymbol.Empty]: 0
+    };
+    gameLog: {stateId: string, move: TicTacToeMove}[] = [];
+
     constructor(private player1: TicTacToePlayer, private player2: TicTacToePlayer) {
     }
 
     play() {
         let state =  new TicTacToeState();
         let isGameOver = false;
+        this.resetGame();
         this.player1.startGame();
         this.player2.startGame();
 
         while(!isGameOver) {
-            state = this.player1.playTurn(state);
+            this.playerTurns[this.player1.symbol]++;
+            this.totalMatchTurns++;
+
+            const move = this.player1.playTurn(state);
+            this.gameLog.push({stateId: state.stateId, move});
             this.printBoard(state);
             if(this.hasWon(state, this.player1.symbol)) {
                 isGameOver = true;
                 console.log("Player " + this.player1.symbol + " has won!");
-                this.player1.endGame(this.player1.symbol);
-                this.player2.endGame(this.player1.symbol);
+                this.player1.endGame(this, this.player1.symbol);
+                this.player2.endGame(this, this.player1.symbol);
                 return;
             }
+
+            this.playerTurns[this.player2.symbol]++;
+            this.totalMatchTurns++;
+
             state = this.player2.playTurn(state);
             this.printBoard(state);
             if(this.hasWon(state, this.player2.symbol)) {
                 isGameOver = true;
                 console.log("Player " + this.player2.symbol + " has won!");
-                this.player1.endGame(this.player2.symbol);
-                this.player2.endGame(this.player2.symbol);
+                this.player1.endGame(this, this.player2.symbol);
+                this.player2.endGame(this, this.player2.symbol);
             }
         }
     }
@@ -43,11 +61,17 @@ export class TicTacToeGame {
         console.log(state.board.map((row) => row.map((cell) => cell === Empty ? " " : cell).join(" ")).join("\n"));
     }
 
+    private resetGame() {
+        this.totalMatchTurns = 0;
+        this.playerTurns = {
+            [TicTacToeSymbol.X]: 0,
+            [TicTacToeSymbol.O]: 0,
+            [TicTacToeSymbol.Empty]: 0
+        }
+    }
+
     calculateChainLength(state: TicTacToeState, symbol: TicTacToeSymbol): number {
         let longestChain = 0;
-
-        let diagonalRL = 0;
-        let diagonalLR = 0;
 
         for(let i = 0; i < state.board.length; i++) {
             let localChainX = 0;

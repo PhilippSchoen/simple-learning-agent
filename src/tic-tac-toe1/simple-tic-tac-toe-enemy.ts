@@ -1,6 +1,8 @@
 import {TicTacToePlayer} from "./tic-tac-toe-player";
 import {TicTacToeSymbol} from "./tic-tac-toe-symbol";
 import {TicTacToeState} from "./tic-tac-toe-state";
+import {TicTacToeGame} from "./tic-tac-toe-game";
+import {TicTacToeMove} from "./entities/tic-tac-toe-move";
 
 export class SimpleTicTacToeEnemy extends TicTacToePlayer {
 
@@ -10,21 +12,20 @@ export class SimpleTicTacToeEnemy extends TicTacToePlayer {
         super(symbol);
     }
 
-    endGame(winner: TicTacToeSymbol) {
+    endGame(game: TicTacToeGame, winner: TicTacToeSymbol) {
     }
 
-    playTurn(state: TicTacToeState): TicTacToeState {
-        let changedState = new TicTacToeState();
-        changedState.board = state.board.map((row) => row.map((cell) => cell));
+    playTurn(state: TicTacToeState): TicTacToeMove {
+        let move: TicTacToeMove;
         if(this.turnCount < state.board[0].length) {
             if(state.board[1][this.turnCount] === TicTacToeSymbol.Empty) {
-                changedState.board[1][this.turnCount] = this.symbol;
+                move = new TicTacToeMove(1, this.turnCount, this.symbol);
             }
         }
 
         this.turnCount++;
 
-        return changedState;
+        return move;
     }
 
     startGame() {

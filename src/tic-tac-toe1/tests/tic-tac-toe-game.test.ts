@@ -1,10 +1,8 @@
 import {TicTacToeGame} from "../tic-tac-toe-game";
-import {O, X, Empty} from "../tic-tac-toe-symbol";
+import {Empty, O, X} from "../tic-tac-toe-symbol";
 import {MockPlayer} from "./mock-tic-tac-toe-player";
 import {TicTacToePlayer} from "../tic-tac-toe-player";
-import {TicTacToeService} from "../../tic-tac-toe/tic-tac-toe.service";
 import {TicTacToeState} from "../tic-tac-toe-state";
-import {mocked} from "jest-mock"
 
 describe('TicTacToeGame', () => {
     test('play function should run a full game', () => {
@@ -20,14 +18,22 @@ describe('TicTacToeGame', () => {
         const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
 
         const game = new TicTacToeGame(mockPlayer1, mockPlayer2);
+        expect(game.totalMatchTurns).toBe(0);
+        expect(game.playerTurns.X).toBe(0);
+        expect(game.playerTurns.O).toBe(0);
+
         game.play();
 
         expect(startGameSpyP1).toHaveBeenCalledTimes(1);
         expect(startGameSpyP2).toHaveBeenCalledTimes(1);
         expect(playTurnSpyP1).toHaveBeenCalledTimes(3);
         expect(playTurnSpyP2).toHaveBeenCalledTimes(2);
-        expect(endGameSpyP1).toHaveBeenCalledWith(X);
-        expect(endGameSpyP2).toHaveBeenCalledWith(X);
+        expect(endGameSpyP1).toHaveBeenCalledWith(game, X);
+        expect(endGameSpyP2).toHaveBeenCalledWith(game, X);
+
+        expect(game.totalMatchTurns).toBe(5);
+        expect(game.playerTurns.X).toBe(3);
+        expect(game.playerTurns.O).toBe(2);
     });
 
     test('play function should work for a second game', () => {
@@ -44,14 +50,22 @@ describe('TicTacToeGame', () => {
         const endGameSpyP1 = jest.spyOn(mockPlayer1, 'endGame');
         const endGameSpyP2 = jest.spyOn(mockPlayer2, 'endGame');
 
+        expect(game.totalMatchTurns).toBe(5);
+        expect(game.playerTurns.X).toBe(2);
+        expect(game.playerTurns.O).toBe(3);
+
         game.play();
 
         expect(startGameSpyP1).toHaveBeenCalledTimes(1);
         expect(startGameSpyP2).toHaveBeenCalledTimes(1);
         expect(playTurnSpyP1).toHaveBeenCalledTimes(3);
         expect(playTurnSpyP2).toHaveBeenCalledTimes(2);
-        expect(endGameSpyP1).toHaveBeenCalledWith(O);
-        expect(endGameSpyP2).toHaveBeenCalledWith(O);
+        expect(endGameSpyP1).toHaveBeenCalledWith(game, O);
+        expect(endGameSpyP2).toHaveBeenCalledWith(game, O);
+
+        expect(game.totalMatchTurns).toBe(5);
+        expect(game.playerTurns.X).toBe(2);
+        expect(game.playerTurns.O).toBe(3);
     });
 });
 

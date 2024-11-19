@@ -1,6 +1,7 @@
 import {TicTacToePlayer} from "../tic-tac-toe-player";
 import {TicTacToeSymbol} from "../tic-tac-toe-symbol";
 import {TicTacToeState} from "../tic-tac-toe-state";
+import {TicTacToeGame} from "../tic-tac-toe-game";
 
 export class MockPlayer extends TicTacToePlayer {
     constructor(public symbol: TicTacToeSymbol, private playerId: 1 | 2) {
@@ -9,7 +10,7 @@ export class MockPlayer extends TicTacToePlayer {
 
     turnCount = 0;
 
-    endGame(winner: TicTacToeSymbol): void {
+    endGame(game: TicTacToeGame, winner: TicTacToeSymbol): void {
     }
 
     startGame(): void {
