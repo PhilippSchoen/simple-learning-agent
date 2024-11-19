@@ -6,6 +6,8 @@ It learns by first trying out all possible moves until confident enough, then al
 
 Both competing agents learn all of the moves surprisingly fast, 
 and then figure out how to always land a draw.
+I made the agent log "FULLY TRAINED" whenever it encountered a state where it had already tried all possible moves -
+this makes it really transparent for watching the agent's learning process.
 
 ## Usage
 
