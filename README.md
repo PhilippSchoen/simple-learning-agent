@@ -11,3 +11,5 @@ It learns by first trying out all possible moves until confident enough, then al
 - Run `npm install` in the project's root folder
 - Run `npm run build` to build the TypeScript code
 - Run `npm run start` to start the agent and watch its plays against a simple enemy in the console
+
+If you want to change the amount of games the agent is training/playing, just change the `trainingCycles` variable in the `index.ts` file and build the project again.
