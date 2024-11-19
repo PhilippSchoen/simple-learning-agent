@@ -34,6 +34,7 @@ describe('TicTacToeGame', () => {
         expect(game.gameLog.length).toBe(5);
         expect(game.gameLog[0].stateId).toBe('---------');
         expect(game.gameLog[1].stateId).toBe('---X-----');
+        expect(game.gameLog[2].move).not.toBe(game.gameLog[0].move);
         expect(game.playerTurns.X).toBe(3);
         expect(game.playerTurns.O).toBe(2);
     });
@@ -68,6 +69,7 @@ describe('TicTacToeGame', () => {
         expect(game.gameLog.length).toBe(5);
         expect(game.playerTurns.X).toBe(2);
         expect(game.playerTurns.O).toBe(3);
+        expect(game.gameLog[2].move).not.toBe(game.gameLog[0].move);
     });
 });
 
