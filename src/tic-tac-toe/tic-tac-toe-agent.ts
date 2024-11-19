@@ -16,6 +16,18 @@ export class TicTacToeAgent extends TicTacToePlayer {
     private requiredConfidence = 2;
 
     endGame(game:TicTacToeGame, winner:TicTacToeSymbol): void {
+        let rating: number;
+        switch(winner) {
+            case this.symbol:
+                rating = 3;
+                break;
+            case Empty:
+                rating = 1;
+                break;
+            default:
+                rating = -3;
+        }
+
         for(let i = 0; i < game.gameLog.length; i++) {
             if(game.gameLog[i].move?.symbol === this.symbol) {
                 const turn = game.gameLog[i]
@@ -27,7 +39,7 @@ export class TicTacToeAgent extends TicTacToePlayer {
                     experience = new Experience(turn.move, 0, 0);
                     this.history.get(turn.stateId).push(experience);
                 }
-                this.updateRating(experience, winner === this.symbol ? 3 : -3);
+                this.updateRating(experience, rating);
             }
         }
     }
@@ -61,6 +73,7 @@ export class TicTacToeAgent extends TicTacToePlayer {
         if(this.history.get(state.stateId).find((exp) => exp.confidence < this.requiredConfidence)) {
             return 1;
         }
+        console.log("FULLY TRAINED");
         return 0;
     }
 

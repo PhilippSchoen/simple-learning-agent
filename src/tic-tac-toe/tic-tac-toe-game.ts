@@ -1,6 +1,6 @@
 import {TicTacToePlayer} from "./tic-tac-toe-player";
 import {TicTacToeState} from "./tic-tac-toe-state";
-import {Empty, TicTacToeSymbol} from "./tic-tac-toe-symbol";
+import {Empty, TicTacToeSymbol, X} from "./tic-tac-toe-symbol";
 import {TicTacToeMove} from "./entities/tic-tac-toe-move";
 
 export class TicTacToeGame {
@@ -30,11 +30,8 @@ export class TicTacToeGame {
             state = this.executeMove(state, move);
 
             this.printBoard(state);
-            if(this.hasWon(state, this.player1.symbol)) {
+            if(this.hasEnded(state)) {
                 isGameOver = true;
-                console.log("Player " + this.player1.symbol + " has won!");
-                this.player1.endGame(this, this.player1.symbol);
-                this.player2.endGame(this, this.player1.symbol);
                 return;
             }
 
@@ -45,13 +42,43 @@ export class TicTacToeGame {
             state = this.executeMove(state, move);
 
             this.printBoard(state);
-            if(this.hasWon(state, this.player2.symbol)) {
-                isGameOver = true;
-                console.log("Player " + this.player2.symbol + " has won!");
-                this.player1.endGame(this, this.player2.symbol);
-                this.player2.endGame(this, this.player2.symbol);
+            isGameOver = this.hasEnded(state);
+        }
+    }
+
+    private hasEnded(state: TicTacToeState): boolean {
+        if(this.hasWon(state, this.player1.symbol)) {
+            console.log("Player " + this.player1.symbol + " has won!");
+            this.player1.endGame(this, this.player1.symbol);
+            this.player2.endGame(this, this.player1.symbol);
+            return true;
+        }
+        else if(this.hasWon(state, this.player2.symbol)) {
+            console.log("Player " + this.player2.symbol + " has won!");
+            this.player1.endGame(this, this.player2.symbol);
+            this.player2.endGame(this, this.player2.symbol);
+            return true;
+        }
+        else if(this.getAvailableActions(state).length === 0) {
+            console.log("Match ended with a draw!");
+            this.player1.endGame(this, Empty);
+            this.player2.endGame(this, Empty);
+            return true;
+        }
+        return false;
+    }
+
+    private getAvailableActions(state: TicTacToeState): TicTacToeMove[] {
+        const actions: TicTacToeMove[] = [];
+        for (let i = 0; i < state.board.length; i++) {
+            for (let j = 0; j < state.board[i].length; j++) {
+                const move = new TicTacToeMove(i, j, X);
+                if(this.isValidMove(state, move)) {
+                    actions.push(move);
+                }
             }
         }
+        return actions;
     }
 
     private executeMove(state: TicTacToeState, move: TicTacToeMove): TicTacToeState {
